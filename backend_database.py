@@ -2,14 +2,13 @@ from langgraph.graph import StateGraph, START, END
 from langchain_mistralai import ChatMistralAI
 from typing import TypedDict, Annotated
 from dotenv import load_dotenv
-from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
-from langgraph.checkpoint.memory import InMemorySaver # stores memory in RAM
 from langgraph.checkpoint.sqlite import SqliteSaver
 import sqlite3
 
 load_dotenv()  
-llm = ChatMistralAI()
+llm = ChatMistralAI(model="mistral-large-latest", temperature=0)
 
 # setup checkpointer 
 conn = sqlite3.connect(database='chatbot.db', check_same_thread=False) # connection object
@@ -27,7 +26,6 @@ def chat_node(state: ChatState):
     # update state
     return {"messages": [response]}
 
-checkpointer = InMemorySaver()
 graph = StateGraph(ChatState)
 graph.add_node("chat_node", chat_node)
 
